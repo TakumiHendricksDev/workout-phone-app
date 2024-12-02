@@ -19,8 +19,6 @@ const Login = () => {
         mutationKey: ['login']
     });
     const dispatch = useDispatch();
-
-    useSelector((state) => console.log(state));
     const router = useRouter();
     return (
         <View style={styles.container}>
