@@ -1,4 +1,5 @@
 import axios from 'axios';
+import {useSelector} from "react-redux";
 
 // Login
 
@@ -31,6 +32,32 @@ const registerUser = async ({email, password, confirmPassword}) => {
         }
     );
     return response.data;
+};
+
+const get = async (url) => {
+    const {user} = useSelector((state) => state.auth);
+
+    if (!user) {
+        return null;
+    }
+
+    const token = user.token_object.access_token;
+
+    try {
+        const response = await axios.get(
+            url,
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        throw error;
+    }
 };
 
 export {loginUser, registerUser};

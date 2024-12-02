@@ -9,7 +9,7 @@ from sqlmodel import select
 from passlib.context import CryptContext
 
 from .models import User, UserRegister, UserLogin, Token, LoggedInUser
-from ..dependencies import SessionDep
+from ..dependencies import SessionDep, get_current_user
 
 load_dotenv()
 
@@ -91,6 +91,10 @@ async def login_user(user: UserLogin, session: SessionDep):
         token_object=token
     )
 
-@router.get("/", response_model=List[User], response_model_exclude={"hashed_password"})
-async def get_users(session: SessionDep, offset: int = 0, limit: Annotated[int, Query(le=100)] = 100) -> List[User]:
+@router.get("/", response_model=List[User], response_model_exclude={"hashed_password"}, dependencies=[Depends(get_current_user)])
+async def get_users(
+    session: SessionDep,
+    offset: int = 0,
+    limit: Annotated[int, Query(le=100)] = 100,
+) -> List[User]:
     return session.exec(select(User).offset(offset).limit(limit)).all()
