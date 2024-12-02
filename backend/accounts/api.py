@@ -8,14 +8,15 @@ from fastapi import APIRouter, Depends, Query, HTTPException, status
 from sqlmodel import select
 from passlib.context import CryptContext
 
-from .models import User, UserRegister, UserLogin, Token
+from .models import User, UserRegister, UserLogin, Token, LoggedInUser
 from ..dependencies import SessionDep
 
 load_dotenv()
 
 SECRET_KEY = os.environ.get("SECRET_KEY", "")
 ALGORITHM = os.environ.get("ALGORITHM", "")
-ACCESS_TOKEN_EXPIRE_MINUTES = os.environ.get("ACCESS_TOKEN_EXPIRE_MINUTES", "")
+ACCESS_TOKEN_EXPIRE_MINUTES = os.environ.get("ACCESS_TOKEN_EXPIRE_MINUTES", 480)
+access_token_expires_minutes = int(ACCESS_TOKEN_EXPIRE_MINUTES)
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -24,7 +25,7 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        expire = datetime.utcnow() + timedelta(minutes=access_token_expires_minutes)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
@@ -67,7 +68,7 @@ async def register_user(user: UserRegister, session: SessionDep):
     session.refresh(new_user)
     return new_user
 
-@router.post("/login", response_model=Token)
+@router.post("/login", response_model=LoggedInUser)
 async def login_user(user: UserLogin, session: SessionDep):
     user_in_db = session.exec(select(User).where(User.email == user.email)).first()
     if not user_in_db or not verify_password(user.password, user_in_db.hashed_password):
@@ -75,11 +76,20 @@ async def login_user(user: UserLogin, session: SessionDep):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password",
         )
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token_expires = timedelta(minutes=access_token_expires_minutes)
     access_token = create_access_token(
         data={"sub": user_in_db.email}, expires_delta=access_token_expires
     )
-    return Token(access_token=access_token, token_type="bearer", expires_in=ACCESS_TOKEN_EXPIRE_MINUTES)
+    token = Token(access_token=access_token, token_type="bearer", expires_in=access_token_expires_minutes)
+
+    return LoggedInUser(
+        id=user_in_db.id,
+        email=user_in_db.email,
+        first_name=user_in_db.first_name,
+        last_name=user_in_db.last_name,
+        is_active=user_in_db.is_active,
+        token_object=token
+    )
 
 @router.get("/", response_model=List[User], response_model_exclude={"hashed_password"})
 async def get_users(session: SessionDep, offset: int = 0, limit: Annotated[int, Query(le=100)] = 100) -> List[User]:

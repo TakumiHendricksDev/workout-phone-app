@@ -1,8 +1,12 @@
-import {View, Text, StyleSheet, TouchableOpacity, TextInput} from "react-native";
+import {View, Text, StyleSheet, TouchableOpacity, TextInput, ActivityIndicator} from "react-native";
 import React from "react";
 import {Formik} from "formik";
 import * as yup from "yup";
 import {useRouter} from "expo-router";
+import {useMutation} from "@tanstack/react-query";
+import {loginUser} from "../(services)/api/api";
+import {useDispatch, useSelector} from "react-redux";
+import {loginUserAction} from "../(redux)/authSlice";
 
 const validationSchema = yup.object().shape({
     email: yup.string().email().required('Email is Required.').label("Email"),
@@ -10,17 +14,27 @@ const validationSchema = yup.object().shape({
 });
 
 const Login = () => {
+    const mutation = useMutation({
+        mutationFn: loginUser,
+        mutationKey: ['login']
+    });
+    const dispatch = useDispatch();
+
+    useSelector((state) => console.log(state));
     const router = useRouter();
     return (
         <View style={styles.container}>
             <Text style={styles.title}>
                 Login
             </Text>
+            {mutation?.isError && <Text style={styles.errorText}>{mutation?.error?.response?.data?.detail || mutation?.error?.message}</Text>}
             <Formik
-                initialValues={{email: 'testemail@gmail.com', password: 'testpass'}}
+                initialValues={{email: 'test@gmail.com', password: 'testpass'}}
                 onSubmit={(values) => {
-                    console.log(values);
-                    router.push("/(tabs)");
+                    mutation.mutateAsync(values).then((data) => {
+                        dispatch(loginUserAction(data));
+                        router.push("/(tabs)");
+                    }).catch((error) => {});
                 }}
                 validationSchema={validationSchema}
             >
@@ -52,9 +66,13 @@ const Login = () => {
                         />
                         {touched.password && errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
                         <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-                            <Text style={styles.buttonText}>
+                            {mutation?.isPending ? (
+                                <ActivityIndicator color="#fff" />
+                                ):
+                                <Text style={styles.buttonText}>
                                 Login
-                            </Text>
+                                </Text>
+                            }
                         </TouchableOpacity>
                     </View>
                 )}

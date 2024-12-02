@@ -1,7 +1,9 @@
-import {View, Text, StyleSheet, TouchableOpacity, TextInput} from "react-native";
+import {View, Text, StyleSheet, TouchableOpacity, TextInput, ActivityIndicator} from "react-native";
 import React from "react";
 import {Formik} from "formik";
 import * as yup from "yup";
+import {useMutation} from "@tanstack/react-query";
+import {registerUser} from "../(services)/api/api";
 
 const validationSchema = yup.object().shape({
     email: yup.string().email().required('Email is Required.').label("Email"),
@@ -10,14 +12,23 @@ const validationSchema = yup.object().shape({
 });
 
 const Register = () => {
+    const mutation = useMutation({
+        mutationFn: registerUser,
+        mutationKey: ['register']
+    });
     return (
         <View style={styles.container}>
             <Text style={styles.title}>
                 Register
             </Text>
+            {mutation?.isError && <Text style={styles.errorText}>{mutation?.error?.response?.data?.detail || mutation?.error?.message}</Text>}
             <Formik
                 initialValues={{email: '', password: '', confirmPassword: ''}}
-                onSubmit={(values) => {console.log(values)}}
+                onSubmit={(values) => {
+                    mutation.mutateAsync(values).then((data) => {
+                        router.push("/auth/login");
+                    }).catch((error) => {});
+                }}
                 validationSchema={validationSchema}
             >
                 {({
@@ -57,9 +68,13 @@ const Register = () => {
                         />
                         {touched.confirmPassword && errors.confirmPassword && <Text style={styles.errorText}>{errors.confirmPassword}</Text>}
                         <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-                            <Text style={styles.buttonText}>
+                            {mutation?.isPending ? (
+                                <ActivityIndicator color="#fff" />
+                                ):
+                                <Text style={styles.buttonText}>
                                 Register
-                            </Text>
+                                </Text>
+                            }
                         </TouchableOpacity>
                     </View>
                 )}

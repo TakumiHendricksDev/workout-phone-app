@@ -29,6 +29,7 @@ app = FastAPI(
         "email": "TakumiHendricksDev@gmail.com",
         "url": "https://www.takumihendricksportfolio.com"
     },
+    root_path="/api"
 )
 
 app.include_router(accounts)

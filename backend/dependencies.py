@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from fastapi import Header, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlmodel import Session, select
-from jose import JWTError, jwt
+from jose import jwt, JWTError
 
 from backend.accounts.models import User
 from db import engine

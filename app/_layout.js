@@ -1,15 +1,16 @@
 import {Stack} from "expo-router";
-import {NavigationContainer} from "expo-router/build/fork/NavigationContainer";
+import queryClient from "./(services)/queryClient";
+import {QueryClientProvider} from "@tanstack/react-query";
+import AppWrapper from "./(redux)/AppWrapper";
+import {Provider} from "react-redux";
+import {store} from "./(redux)/store";
 
 export default function RootLayout() {
     return (
-        <Stack>
-            <Stack.Screen
-                name="index"
-                options={
-                {headerShown: false}
-                }
-            ></Stack.Screen>
-        </Stack>
+        <Provider store={store}>
+            <QueryClientProvider client={queryClient}>
+                <AppWrapper />
+            </QueryClientProvider>
+        </Provider>
     )
 }

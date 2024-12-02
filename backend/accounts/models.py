@@ -21,3 +21,11 @@ class Token(SQLModel):
     access_token: str
     token_type: str
     expires_in: int
+
+class LoggedInUser(SQLModel):
+    id: int
+    email: str
+    first_name: str
+    last_name: str
+    is_active: bool
+    token_object: Token
