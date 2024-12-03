@@ -2,6 +2,10 @@ import uvicorn
 from fastapi import FastAPI
 
 from backend.accounts.api import router as accounts
+from backend.workouts.api import router as workouts
+
+from backend.accounts import models as accounts_models
+from backend.workouts import models as workout_models
 
 description = """
     Workout API gives you the access to many Exercises to help you get in shape. 
@@ -33,6 +37,7 @@ app = FastAPI(
 )
 
 app.include_router(accounts)
+app.include_router(workouts)
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

@@ -1,11 +1,14 @@
 import axios from 'axios';
 import {useSelector} from "react-redux";
+import {store} from "../../(redux)/store";
+
+const base_url =  "https://411e38657c6a.ngrok.app";
 
 // Login
 
 const loginUser = async ({email, password}) => {
     const response = await axios.post(
-        'https://a8b3833b3112.ngrok.app/api/users/login', {
+        `${base_url}/api/users/login`, {
         email,
         password
         },
@@ -20,7 +23,7 @@ const loginUser = async ({email, password}) => {
 
 const registerUser = async ({email, password, confirmPassword}) => {
     const response = await axios.post(
-        'https://a8b3833b3112.ngrok.app/api/users/register', {
+        `${base_url}/api/users/register`, {
         email,
         password,
         confirm_password: confirmPassword
@@ -34,30 +37,26 @@ const registerUser = async ({email, password, confirmPassword}) => {
     return response.data;
 };
 
-const get = async (url) => {
-    const {user} = useSelector((state) => state.auth);
+const api = axios.create({
+    baseURL: base_url,
+    headers: {
+        'Content-Type': 'application/json',
+    },
+});
 
-    if (!user) {
-        return null;
+api.interceptors.request.use(
+    async (config) => {
+        const state = store.getState();
+        const { user } = state.auth;
+        if (user) {
+            const token = user.token_object.access_token;
+            config.headers['Authorization'] = `Bearer ${token}`;
+        }
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
     }
+);
 
-    const token = user.token_object.access_token;
-
-    try {
-        const response = await axios.get(
-            url,
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                }
-            }
-        );
-        return response.data;
-    } catch (error) {
-        console.error('Error fetching data:', error);
-        throw error;
-    }
-};
-
-export {loginUser, registerUser};
+export { loginUser, registerUser, api };

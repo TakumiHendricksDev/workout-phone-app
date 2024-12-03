@@ -21,7 +21,7 @@ const Home = () => {
             ></Video>
             <View style={styles.overlay}>
                 <Text style={styles.mainText}>
-                    Bro Liftz
+                    BroLiftz
                 </Text>
                 <Text style={styles.subText}>
                     Workout App for Bros

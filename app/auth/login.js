@@ -31,7 +31,7 @@ const Login = () => {
                 onSubmit={(values) => {
                     mutation.mutateAsync(values).then((data) => {
                         dispatch(loginUserAction(data));
-                        router.push("/(tabs)");
+                        router.push("/(tabs)/home");
                     }).catch((error) => {});
                 }}
                 validationSchema={validationSchema}

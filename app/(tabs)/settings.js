@@ -76,6 +76,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: "center",
     color: "#333",
+    marginTop: 64,
   },
   section: {
     marginVertical: 10,

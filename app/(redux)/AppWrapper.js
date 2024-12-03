@@ -17,6 +17,14 @@ const AppWrapper = () => {
                     title: 'Home'
                 }}
             ></Stack.Screen>
+            <Stack.Screen
+                name='(tabs)'
+                options={{
+                    headerShown: false,
+                    title: 'BroLiftz',
+                    headerBackVisible: false
+                }}
+            ></Stack.Screen>
         </Stack>
     )
 }
