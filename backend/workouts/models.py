@@ -17,19 +17,19 @@ class Workout(SQLModel, table=True):
 class Exercise(SQLModel, table=True):
     id: int = Field(primary_key=True)
     name: str = Field(max_length=50)
-    exercise_model_groups: List["ExerciseModelGroup"] = Relationship(back_populates="exercise")
+    exercise_muscle_groups: List["ExerciseMuscleGroup"] = Relationship(back_populates="exercise")
 
 class MuscleGroup(SQLModel, table=True):
     id: int = Field(primary_key=True)
     name: str = Field(max_length=50)
-    exercise_model_groups: List["ExerciseModelGroup"] = Relationship(back_populates="muscle_group")
+    exercise_muscle_groups: List["ExerciseMuscleGroup"] = Relationship(back_populates="muscle_group")
 
-class ExerciseModelGroup(SQLModel, table=True):
+class ExerciseMuscleGroup(SQLModel, table=True):
     id: int = Field(primary_key=True)
     exercise_id: int = Field(foreign_key="exercise.id")
     muscle_group_id: int = Field(foreign_key="musclegroup.id")
-    exercise: Exercise = Relationship(back_populates="exercise_model_groups")
-    muscle_group: MuscleGroup = Relationship(back_populates="exercise_model_groups")
+    exercise: Exercise = Relationship(back_populates="exercise_muscle_groups")
+    muscle_group: MuscleGroup = Relationship(back_populates="exercise_muscle_groups")
 
 class WorkoutExercise(SQLModel, table=True):
     id: int = Field(primary_key=True)
@@ -54,3 +54,7 @@ class ExerciseResponse(SQLModel):
     id: int
     name: str
     muscle_groups: str
+
+class CreateWorkoutExercise(SQLModel):
+    workout_id: int
+    exercise_id: int

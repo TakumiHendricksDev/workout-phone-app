@@ -10,19 +10,29 @@ const Workout = () => {
     const [workout, setWorkout] = useState(null);
     const [exercises, setExercises] = useState([]);
     const [visible, setVisible] = React.useState(false);
+    const [workoutExercises, setWorkoutExercises] = useState([]);
 
     const showModal = () => setVisible(true);
     const hideModal = () => setVisible(false);
     const containerStyle = {backgroundColor: 'white', padding: 20};
 
-    function createWorkoutExercise(exercise_id) {
+    async function createWorkoutExercise(exercise_id) {
+        try {
+            const response = await api.post(`/api/workouts/workout_exercise/`, {
+                exercise_id: exercise_id,
+                workout_id: id,
+            });
+            setWorkoutExercises([...workoutExercises, response.data]);
+        } catch (error) {
+            console.log(error);
+        }
         hideModal();
     }
 
     useEffect(() => {
         async function getWorkout() {
             try {
-                const response = await api.get(`/api/workouts/${id}`);
+                const response = await api.get(`/api/workouts/${id}/`);
                 setWorkout(response.data);
             } catch (error) {
                 console.log(error);
@@ -30,8 +40,16 @@ const Workout = () => {
         }
         async function getExercises() {
             try {
-                const response = await api.get(`/api/workouts/exercises/`);
+                const response = await api.get('/api/workouts/exercises/');
                 setExercises(response.data);
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        async function getWorkoutExercises() {
+            try {
+                const response = await api.get(`/api/workouts/${id}/exercises/`);
+                setWorkoutExercises(response.data);
             } catch (error) {
                 console.log(error);
             }
@@ -53,7 +71,9 @@ const Workout = () => {
             </Portal>
 
             <Title>{workout?.name}</Title>
-            <WorkoutSet />
+            {workoutExercises.map((workoutExercise) => (
+                <WorkoutSet key={workoutExercise.id} workout_exercise_id={workoutExercise.id} />
+            ))}
             <Button mode={"contained"} onPress={showModal}>Add Exercises</Button>
             <Button mode={"contained"}>Cancel Workout</Button>
         </View>

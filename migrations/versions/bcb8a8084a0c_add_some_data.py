@@ -40,7 +40,7 @@ def upgrade() -> None:
         """
     )
 
-    # Add data to the ExerciseModelGroup table
+    # Add data to the ExerciseMuscleGroup table
     op.execute(
         """
         INSERT INTO exercisemodelgroup (id, exercise_id, muscle_group_id) VALUES
@@ -51,7 +51,7 @@ def upgrade() -> None:
     )
 
 def downgrade() -> None:
-    # Remove data from the ExerciseModelGroup table
+    # Remove data from the ExerciseMuscleGroup table
     op.execute("DELETE FROM exercisemodelgroup WHERE id IN (1, 2, 3)")
 
     # Remove data from the MuscleGroup table

@@ -2,7 +2,7 @@ import axios from 'axios';
 import {useSelector} from "react-redux";
 import {store} from "../../(redux)/store";
 
-const base_url =  "https://411e38657c6a.ngrok.app";
+const base_url = "https://76d2a6b122ed.ngrok.app";
 
 // Login
 

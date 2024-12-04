@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
 import { api } from '../../(services)/api/api.js';
-import {Button, Card} from "react-native-paper";
+import {Button, List} from "react-native-paper";
 
 const Workouts = () => {
     const router = useRouter();
@@ -37,26 +37,26 @@ const Workouts = () => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Start a Workout</Text>
-            <Button onPress={createWorkout} mode="contained">Create Workout</Button>
-            <View style={styles.cardList}>
+            <View style = {styles.middleContainer}>
+                <Text style={styles.title}>Start a Workout</Text>
+                <Button onPress={createWorkout} mode="contained">Create Workout</Button>
+            </View>
+            <View>
+                <List.Section title="Workouts">
                 {workouts.map((workout) => (
-                    <TouchableOpacity key={workout.id} onPress={() => router.push({
-                        pathname: "/workouts/[id]",
-                        params: {
-                            id: workout.id
-                        }
-                    })}>
-                        <Card>
-                            <Card.Title title={`Workout ${workout.id}`} subtitle={`Past workout`} />
-                            <Card.Content>
-                                <Text>
-                                    Some test content
-                                </Text>
-                            </Card.Content>
-                        </Card>
-                    </TouchableOpacity>
+                    <List.Item
+                        title={workout.name}
+                        key={workout.id}
+                        description={new Date(workout.start_at).toLocaleString()}
+                        onPress={() => router.push({
+                            pathname: "/workouts/[id]",
+                            params: {
+                                id: workout.id
+                            }
+                        })}
+                    ></List.Item>
                 ))}
+                </List.Section>
             </View>
         </View>
     );
@@ -67,8 +67,11 @@ export default Workouts;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        alignItems: "center",
         padding: 16,
+    },
+    middleContainer: {
+        flex: 1,
+        alignItems: "center",
     },
     title: {
         fontSize: 32,
@@ -88,11 +91,4 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: "bold",
     },
-    cardList: {
-        flex: 1,
-        padding: 24,
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        gap: 24
-    }
 });

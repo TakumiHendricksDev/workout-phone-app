@@ -1,6 +1,6 @@
 export const Colors = {
   light: {
-    primary: "rgb(176, 46, 0)",
+    primary: "#6200ea",
     onPrimary: "rgb(255, 255, 255)",
     primaryContainer: "rgb(255, 219, 209)",
     onPrimaryContainer: "rgb(59, 9, 0)",
